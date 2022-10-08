@@ -9,39 +9,45 @@ const formElement = getElementById('chat_form');
 
 //* global socket handler
 socket.on('user_connected', (userName) => {
-  drawNewchat(`${userName} connected!`);
+  drawNewChat(`${userName} connected!`);
 });
-
 socket.on('new_chat', (data) => {
   const { chat, userName } = data;
-  drawNewchat(`${userName}: ${chat}`);
+  drawNewChat(`${userName}: ${chat}`);
 });
+socket.on('disconnect_user', (userName) => drawNewChat(`${userName}: bye...`));
 
 //* event callback functions
 const handleSubmit = (event) => {
   event.preventDefault();
   const inputValue = event.target.elements[0].value;
-  console.log(inputValue);
   if (inputValue !== '') {
     socket.emit('submit_chat', inputValue);
-    // Draw on Screen
-    drawNewchat(`Me: ${inputValue}`);
+    // 화면에다가 그리기
+    drawNewChat(`me : ${inputValue}`, true);
     event.target.elements[0].value = '';
   }
 };
 
 //* draw functions
-const drawHelloStranger = (userName) => {
-  helloStrangerElement.innerHTML = `Hello ${userName} Stranger :)`;
-};
-
-const drawNewchat = (message) => {
+const drawHelloStranger = (userName) =>
+  (helloStrangerElement.innerText = `Hello ${userName} Stranger :)`);
+const drawNewChat = (message, isMe = false) => {
   const wrapperChatBox = document.createElement('div');
-  const chatBox = `
-    <div>
+  wrapperChatBox.className = 'clearfix';
+  let chatBox;
+  if (!isMe)
+    chatBox = `
+    <div class='bg-gray-300 w-3/4 mx-4 my-2 p-2 rounded-lg clearfix break-all'>
       ${message}
     </div>
-  `;
+    `;
+  else
+    chatBox = `
+    <div class='bg-white w-3/4 ml-auto mr-4 my-2 p-2 rounded-lg clearfix break-all'>
+      ${message}
+    </div>
+    `;
   wrapperChatBox.innerHTML = chatBox;
   chattingBoxElement.append(wrapperChatBox);
 };
@@ -55,7 +61,7 @@ function helloUser() {
 
 function init() {
   helloUser();
-  // Event Connect
+  // 이벤트 연결
   formElement.addEventListener('submit', handleSubmit);
 }
 
