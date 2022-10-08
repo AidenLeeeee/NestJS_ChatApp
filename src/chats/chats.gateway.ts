@@ -41,4 +41,15 @@ export class ChatsGateway
     socket.broadcast.emit('user_connected', userName);
     return userName;
   }
+
+  @SubscribeMessage('submit_chat')
+  handleSubmitChat(
+    @MessageBody() chat: string,
+    @ConnectedSocket() socket: Socket,
+  ) {
+    socket.broadcast.emit('new_chat', {
+      chat,
+      userName: socket.id,
+    });
+  }
 }
